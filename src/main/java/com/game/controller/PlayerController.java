@@ -34,7 +34,9 @@ public class PlayerController {
         pageSize = isNull(pageSize) ? 3 : pageSize;
 
         List<Player> players = playerService.getAll(pageNumber, pageSize);
-        return players.stream().map(PlayerController::toPlayerInfo).collect(Collectors.toList());
+        return players.stream()
+                .map(PlayerController::toPlayerInfo)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/count")
@@ -44,7 +46,7 @@ public class PlayerController {
 
     @PostMapping
     public ResponseEntity<PlayerInfo> createPlayer(@RequestBody PlayerInfo info) {
-        if (StringUtils.isEmpty(info.name) || info.name.length() > 12) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        if (StringUtils.hasLength(info.name) || info.name.length() > 12) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (info.title.length() > 30) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (isNull(info.race)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         if (isNull(info.profession)) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -76,14 +78,14 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{ID}")
-    public ResponseEntity delete(@PathVariable("ID") long id) {
+    public ResponseEntity<Void> delete(@PathVariable("ID") long id) {
         if (id <= 0) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 
         Player player = playerService.delete(id);
         if (isNull(player)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            return ResponseEntity.status(HttpStatus.OK).body(null);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
     }
 
