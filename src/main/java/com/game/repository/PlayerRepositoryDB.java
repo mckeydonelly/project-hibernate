@@ -38,7 +38,9 @@ public class PlayerRepositoryDB implements IPlayerRepository {
     @Override
     public List<Player> getAll(int pageNumber, int pageSize) {
         try (Session session = sessionFactory.openSession()) {
-            NativeQuery<Player> query = session.createNativeQuery("select * from rpg.player", Player.class);
+            NativeQuery<Player> query = session.createNativeQuery("select * from rpg.player limit ?1 offset ?2", Player.class);
+            query.setParameter(1, pageSize);
+            query.setParameter(2, pageNumber * pageSize);
             return query.list();
         }
     }
